@@ -1,0 +1,40 @@
+library(foreign)       # librería para leer dbf
+library(questionr)     # librería para datos con factor de expansión
+library(ggplot2)       # librería para graficar
+
+# Se lee la tabla Sección III
+sec3 <- read.dbf("TB_SEC_III.dbf")
+
+# Se filtran todos los valores para Coahuila según NOM_ENT
+sec3.coah <- subset(sec3, sec3$NOM_ENT == "Coahuila de Zaragoza")
+
+# Se checan los valores únicos de sec3.coah
+unique(sec3.coah$NOM_MUN)
+
+# Se filtran todos los valores para Torreón segun NOM_MUN
+sec3.trc <- subset(sec3.coah, sec3.coah$NOM_MUN == "TORREÂ¿N")
+
+
+p3_1.lev <- c(1,2,3,4,5,6)    # Se crea vector con niveles (levels)
+p3_1.lab <- c("vive en unión libre", # se crea vector con etiquetas (labels)
+              "está separada",
+              "está divorciada",
+              "es viuda",
+              "está casada",
+              "está soltera")
+
+# Se sustrae de sec3.trc la pregunta, se le asignan los niveles y etiquetas
+p3_1 <- factor(sec3.trc$P3_1,             # pregunta a analizar
+               levels = p3_1.lev,         # vector con niveles o rangos
+               labels = p3_1.lab)         # vector con etiquetas o labels
+
+# Se checan el contenido de la variable p3_1
+summary(p3_1)
+
+
+# También se puede hacer una tabla considerando el factod de expansión que incluye
+# la misma tabla que presenta el INEGI
+p3_1w <- wtd.table(sec3.trc$P3_1,                   # se selecciona la variable a analizar
+                   weights = sec3.trc$FAC_MUJ,      # se selecciona la variable con el factor de expansión 
+                   na.show = TRUE)                  # se toman en cuenta los valores no disponibles o no respuestas
+
